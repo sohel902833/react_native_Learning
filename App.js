@@ -1,4 +1,4 @@
-import HomeStack from "./components/routes/homeStack";
+import HomeStack from "./src/components/routes/homeStack";
 
 export default function App() {
   return <HomeStack />;

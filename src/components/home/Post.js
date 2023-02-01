@@ -1,8 +1,7 @@
 import { View, Text, StyleSheet, Button } from "react-native";
-
-const Home = ({ navigation, route }) => {
+import { Entypo, Ionicons } from "@expo/vector-icons";
+const Post = ({ navigation, route }) => {
   const params = route.params;
-  console.log(params);
   const navigateToReviewDetailsPage = () => {
     navigation.navigate("ReviewDetails", {
       name: "Md Sohrab Hossain",
@@ -15,13 +14,13 @@ const Home = ({ navigation, route }) => {
     <View style={styles.container}>
       <Text>Home Screens</Text>
       {params?.data && <Text>{params?.data}</Text>}
-
+      <Entypo name="home" size={24} color="black" />
       <Button title="Review Details" onPress={navigateToReviewDetailsPage} />
     </View>
   );
 };
 
-export default Home;
+export default Post;
 
 const styles = StyleSheet.create({
   container: {

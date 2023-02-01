@@ -18,7 +18,13 @@ const HomeStack = () => {
           headerTintColor: "white",
         }}
       >
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name="ReviewDetails"
           component={ReviewDetailsScreen}
