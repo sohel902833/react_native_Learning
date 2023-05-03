@@ -1,51 +1,74 @@
-import {useState} from 'react';
-import {View, ScrollView, StyleSheet, Text, RefreshControl} from 'react-native';
+import {NamedExoticComponent, useState} from 'react';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  RefreshControl,
+  FlatList,
+  SectionList,
+} from 'react-native';
 
 const App = () => {
   const [items, setItems] = useState([
     {
-      key: 1,
       item: 'Item1',
     },
     {
-      key: 2,
       item: 'Item2',
     },
     {
-      key: 3,
       item: 'Item3',
     },
     {
-      key: 4,
       item: 'Item4',
     },
     {
-      key: 5,
       item: 'Item5',
     },
     {
-      key: 6,
       item: 'Item6',
     },
     {
-      key: 7,
       item: 'Item7',
     },
     {
-      key: 8,
       item: 'Item8',
     },
     {
-      key: 9,
       item: 'Item9',
     },
     {
-      key: 10,
       item: 'Item10',
     },
     {
-      key: 11,
       item: 'Item11',
+    },
+  ]);
+  const [nestedItems, setNestedItems] = useState([
+    {
+      item: 'Item1',
+      data: ['Item 1-1', 'Item 1-2', 'Item 1-3'],
+    },
+    {
+      item: 'Item2',
+      data: ['Item 1-1', 'Item 1-2', 'Item 1-3'],
+    },
+    {
+      item: 'Item3',
+      data: ['Item 1-1', 'Item 1-2', 'Item 1-3'],
+    },
+    {
+      item: 'Item4',
+      data: ['Item 1-1', 'Item 1-2', 'Item 1-3'],
+    },
+    {
+      item: 'Item5',
+      data: ['Item 1-1', 'Item 1-2', 'Item 1-3'],
+    },
+    {
+      item: 'Item6',
+      data: ['Item 1-1', 'Item 1-2', 'Item 1-3'],
     },
   ]);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,16 +86,51 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <Text style={{fontSize: 30, color: 'black'}}>Section Lists</Text>
+      <SectionList
+        keyExtractor={(item, index) => index.toString()}
+        sections={nestedItems}
+        // horizontal={true}
+        renderItem={({item}) => (
+          <View style={styles.itemContainer}>
+            <Text style={styles.itemText}>{item}</Text>
+          </View>
+        )}
+        renderSectionHeader={({section}) => (
+          <View style={styles.itemContainer}>
+            <Text style={styles.itemText}>{section?.item}</Text>
+          </View>
+        )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        {items.map(item => (
-          <View key={item?.key} style={styles.itemContainer}>
+        }
+      />
+      {/* <Text style={{fontSize: 30, color: 'black'}}>List By Scroll View</Text>
+        <ScrollView
+          style={{height: 400}}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          {items.map(item => (
+            <View style={styles.itemContainer}>
+              <Text style={styles.itemText}>{item?.item}</Text>
+            </View>
+          ))}
+        </ScrollView> */}
+      {/* <Text style={{fontSize: 30, color: 'black'}}>Flat Lists</Text>
+      <FlatList
+        keyExtractor={(item, index) => index.toString()}
+        data={items}
+        // horizontal={true}
+        renderItem={({item}) => (
+          <View style={styles.itemContainer}>
             <Text style={styles.itemText}>{item?.item}</Text>
           </View>
-        ))}
-      </ScrollView>
+        )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      /> */}
     </View>
   );
 };
