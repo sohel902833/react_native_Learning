@@ -12,11 +12,13 @@ import {
   Pressable,
   Alert,
   ToastAndroid,
+  Modal,
 } from 'react-native';
 
 const App = () => {
   const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [enableModal, setEnableModal] = useState(false);
   const handleKeyboardHide = () => {
     Keyboard.dismiss();
   };
@@ -25,23 +27,25 @@ const App = () => {
     if (name?.length > 3) {
       setSubmitted(prev => !prev);
     } else {
-      // Alert.alert(
-      //   'Warning',
-      //   'Name Must Have 3 characters of length.',
-      //   [{text: 'OK'}, {text: 'Cancel'}, {text: 'Cancel'}],
-      //   {cancelable: false},
-      // );
-      ToastAndroid.showWithGravity(
-        'Name Must Have 3 characters of length.',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+      setEnableModal(true);
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={handleKeyboardHide}>
       <View style={styles.container}>
+        <Modal
+          hardwareAccelerated
+          animationType="slide"
+          transparent={true}
+          visible={enableModal}
+          onRequestClose={() => setEnableModal(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text>The name must have 3 characters long.</Text>
+            </View>
+          </View>
+        </Modal>
         <Text style={styles.text}>Please Enter Your Name: </Text>
         <TextInput
           value={name}
@@ -76,6 +80,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#00000010',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    width: 300,
+    height: 300,
   },
   text: {
     fontSize: 20,
