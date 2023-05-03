@@ -10,17 +10,33 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   Pressable,
+  Alert,
+  ToastAndroid,
 } from 'react-native';
 
 const App = () => {
-  const [name, setName] = useState('asdf');
+  const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const handleKeyboardHide = () => {
     Keyboard.dismiss();
   };
 
   const handleSubmit = () => {
-    setSubmitted(prev => !prev);
+    if (name?.length > 3) {
+      setSubmitted(prev => !prev);
+    } else {
+      // Alert.alert(
+      //   'Warning',
+      //   'Name Must Have 3 characters of length.',
+      //   [{text: 'OK'}, {text: 'Cancel'}, {text: 'Cancel'}],
+      //   {cancelable: false},
+      // );
+      ToastAndroid.showWithGravity(
+        'Name Must Have 3 characters of length.',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    }
   };
 
   return (
@@ -37,23 +53,7 @@ const App = () => {
           maxLength={10}
           secureTextEntry={true}
         />
-        <TouchableOpacity
-          activeOpacity={0.5}
-          style={styles.buttonStyle}
-          onPress={handleSubmit}>
-          <Text style={styles.buttonText}>
-            {submitted ? 'Submit' : 'Clear'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableHighlight
-          activeOpacity={0.5}
-          style={styles.buttonStyle}
-          underlayColor="black"
-          onPress={handleSubmit}>
-          <Text style={styles.buttonText}>
-            {submitted ? 'Submit' : 'Clear'}
-          </Text>
-        </TouchableHighlight>
+
         <Pressable
           android_ripple={{color: 'green'}}
           style={styles.buttonStyle}
