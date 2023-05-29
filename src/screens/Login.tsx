@@ -4,62 +4,115 @@ import {
   View,
   StyleSheet,
   Image,
-  TextInput,
-  TouchableWithoutFeedback,
-  Alert,
-  Keyboard,
+  ToastAndroid,
+  Pressable,
 } from 'react-native';
-import CustomButton from '../components/CustomButton';
-import {logoImg} from '../utils/assets';
-import globalStyle from '../utils/globalStyle';
+import {ScrollView} from 'react-native-gesture-handler';
+import IconButton from '../components/Buttons/IconButton';
+import LoginHeader from '../components/Login/LoginHeader';
+import {bkashLogoImg} from '../utils/assets';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+import COLORS from '../utils/colors';
+import InputArea from '../components/TextInputs/InputArea';
+import LabeledIconButton from '../components/Buttons/LabeledIconButton';
+import {CommonActions, NavigationProp} from '@react-navigation/native';
+import {RootStackParamList} from '../App';
+import {useLoginMutation} from '../feature/auth/authApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const Login = ({navigation}: any) => {
-  const [name, setName] = useState('');
+import {AUTH_TOKEN_KEY} from '../utils/constant/Constant';
+import {useDispatch} from 'react-redux';
+import {setUserInfo} from '../feature/auth/authSlice';
+import LoginLinks from '../components/Util/LoginLinks';
 
-  const setData = async () => {
-    if (name.length === 0) {
-      Alert.alert('Warning!', 'Please Write Your Name');
+interface Props {
+  navigation: NavigationProp<RootStackParamList>;
+}
+const Login: React.FC<Props> = ({navigation}: Props) => {
+  const [loginUser, {data, isLoading, isError}] = useLoginMutation();
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+  const handleLoginUser = async () => {
+    const res: any = await loginUser({
+      phone,
+      password,
+    });
+    if (res?.data?.user?._id) {
+      ToastAndroid.show(res?.data?.message, ToastAndroid.SHORT);
+      dispatch(setUserInfo(res?.data?.user));
+      await AsyncStorage.setItem(AUTH_TOKEN_KEY, res?.data?.token);
+      // navigation.dispatch(
+      //   CommonActions.reset({
+      //     index: 0,
+      //     routes: [{name: 'Main_Screen'}],
+      //   }),
+      // );
     } else {
-      try {
-        await AsyncStorage.setItem('UserName', name);
-        navigation.replace('Home');
-      } catch (err) {
-        console.log(err);
-      }
+      ToastAndroid.show(res?.data?.message, ToastAndroid.SHORT);
     }
+    console.log(res, data);
   };
 
-  const getData = async () => {
-    try {
-      const userName = await AsyncStorage.getItem('UserName');
-      if (userName !== null) {
-        navigation.replace('Home');
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const navigateToHomePage = () => {
+    navigation.navigate('Main_Screen');
   };
-  useEffect(() => {
-    getData();
-  }, []);
+  const navigateToRegisterScreen = () => {
+    navigation.navigate('Rg_KeepMobileNumber');
+  };
 
-  const onBodyPress = () => {
-    Keyboard.dismiss();
-  };
   return (
-    <TouchableWithoutFeedback onPress={onBodyPress}>
-      <View style={styles.body}>
-        <Image source={logoImg} style={styles.logo} />
-        <Text style={[globalStyle.bruno, styles.text]}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={name}
-          onChangeText={value => setName(value)}
-        />
-        <CustomButton pressHandler={setData}>Login</CustomButton>
-      </View>
-    </TouchableWithoutFeedback>
+    <View style={styles.body}>
+      <LoginHeader />
+      <ScrollView>
+        <View style={{marginTop: 70, paddingHorizontal: 20}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Image style={{width: 70, height: 70}} source={bkashLogoImg} />
+            <IconButton
+              onPress={() => {}}
+              renderIcon={() => (
+                <AntIcon name="qrcode" color={COLORS.PRIMARY} size={70} />
+              )}
+              variant={'outlined'}
+              style={{borderWidth: 0}}
+            />
+          </View>
+          <Text style={styles.screenTitle}>Login Into Your Bkash Account</Text>
+          <InputArea
+            placeholder="Enter Your Account No."
+            label="Account No"
+            keyboardType="decimal-pad"
+            autoFocus
+            value={phone}
+            onTextChange={value => setPhone(value)}
+          />
+          <InputArea
+            placeholder="Type Your Password"
+            label="Password"
+            keyboardType="decimal-pad"
+            secureText
+            containerStyle={{
+              marginTop: 10,
+              marginBottom: 40,
+            }}
+            value={password}
+            onTextChange={value => setPassword(value)}
+          />
+          <LoginLinks />
+          <LabeledIconButton
+            disabled={isLoading}
+            title="Next"
+            icon={<AntIcon name="arrowright" color={COLORS.WHITE} size={25} />}
+            onPress={handleLoginUser}
+            variant={'contained'}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -68,27 +121,23 @@ export default Login;
 const styles = StyleSheet.create({
   body: {
     flex: 1,
+    backgroundColor: 'white',
+  },
+  screenTitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  linkArea: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0080ff',
+    justifyContent: 'space-between',
+    marginVertical: 20,
   },
-  logo: {
-    width: 200,
-    height: 200,
-    margin: 20,
-  },
-  text: {
-    fontSize: 40,
-    color: 'white',
-  },
-  input: {
-    width: 300,
-    borderWidth: 1,
-    borderColor: '#555',
-    borderRadius: 10,
-    backgroundColor: '#fff',
-    textAlign: 'center',
-    fontSize: 20,
-    marginTop: 130,
-    marginBottom: 10,
+  registerText: {
+    color: COLORS.PRIMARY,
+    fontWeight: 'bold',
   },
 });

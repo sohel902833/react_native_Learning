@@ -1,29 +1,36 @@
 import 'react-native-gesture-handler';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import ScreenA from './screens/ScreenA';
-import ScreenB from './screens/ScreenB';
-import Login from './screens/Login';
-
-const Stack = createStackNavigator();
+import {Provider} from 'react-redux';
+import {store} from './app/store';
+import Navigations from './Navigations';
+export type RootStackParamList = {
+  Login: undefined;
+  Main_Screen: undefined;
+  KeepMobileNumber: undefined;
+  Keep_Password: {
+    phoneNumber: string;
+  };
+  Confirm_Send_Money: {
+    phoneNumber: string;
+    amount: string;
+  };
+  Rg_KeepMobileNumber: undefined;
+  Rg_TakeNidFrontPhotoScreen: {
+    mobileNumber: string;
+  };
+  SignupScreen: {
+    name: string;
+    dateOfBirth: string;
+    idNo: string;
+    mobileNumber: string;
+  };
+  Forget_Password: undefined;
+};
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Home" component={ScreenA} />
-        <Stack.Screen
-          name="Screen_B"
-          component={ScreenB}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <Navigations />
+    </Provider>
   );
 };
 
