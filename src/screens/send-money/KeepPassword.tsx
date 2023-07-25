@@ -8,23 +8,55 @@ import AntIcon from 'react-native-vector-icons/AntDesign';
 import {RootStackParamList} from '../../App';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import globalStyle from '../../utils/globalStyle';
+import {useValidateSendMoneyMutation} from '../../feature/transections/transectionsApi';
+import {ToastAndroid} from 'react-native';
+import {useSelector} from 'react-redux';
+import {IAuth, IUser} from '../../feature/auth/auth.types';
 
 interface Props
   extends NativeStackScreenProps<RootStackParamList, 'Keep_Password'> {}
 
 const KeepPassword = ({navigation, route}: Props) => {
+  const {user} = useSelector((state: {auth: IAuth}) => state.auth);
+
+  const [validateSendMoney, {isLoading}] = useValidateSendMoneyMutation();
   const [amount, setAmount] = useState('');
+  const [password, setPassword] = useState('');
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Send Money',
     });
   });
 
-  const handleNavigate = () => {
+  const handleNavigate = (
+    expiry: number,
+    token: string,
+    avBalance: number,
+    charge: number,
+  ) => {
     navigation.replace('Confirm_Send_Money', {
       phoneNumber: route.params.phoneNumber,
       amount: amount,
+      expiry,
+      token,
+      availableBalance: avBalance,
+      charge,
     });
+  };
+
+  const handleValidateSendMoney = async () => {
+    const res: any = await validateSendMoney({
+      amount,
+      phone: route.params.phoneNumber,
+      password,
+    });
+    if (res?.data?.success) {
+      const {expiry, availableBalance, charge} = res?.data?.meta;
+      handleNavigate(expiry, res?.data?.token, availableBalance, charge);
+    } else {
+      ToastAndroid.show(res?.data?.message, ToastAndroid.LONG);
+    }
+    console.log(res);
   };
 
   return (
@@ -51,7 +83,7 @@ const KeepPassword = ({navigation, route}: Props) => {
           />
         </View>
         <Text style={[styles.receiverText, {color: COLORS.PRIMARY}]}>
-          Available Balance: $34343
+          Available Balance: {user?.balance}
         </Text>
       </View>
       <View style={{marginTop: 15}}></View>
@@ -66,11 +98,14 @@ const KeepPassword = ({navigation, route}: Props) => {
           inputStyle={{
             borderBottomWidth: 0,
           }}
+          value={password}
+          onTextChange={value => setPassword(value)}
         />
         <LabeledIconButton
+          disabled={isLoading}
           title="Next"
           icon={<AntIcon name="arrowright" color={COLORS.WHITE} size={25} />}
-          onPress={handleNavigate}
+          onPress={handleValidateSendMoney}
           variant={'contained'}
         />
 

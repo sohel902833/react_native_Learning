@@ -12,6 +12,10 @@ export type RootStackParamList = {
   Confirm_Send_Money: {
     phoneNumber: string;
     amount: string;
+    expiry: number;
+    token: string;
+    availableBalance: number;
+    charge: number;
   };
   Rg_KeepMobileNumber: undefined;
   Rg_TakeNidFrontPhotoScreen: {

@@ -1,7 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {AUTH_TOKEN_KEY} from '../../utils/constant/Constant';
-const REACT_APP_API_URL = 'http://192.168.0.103:5000/';
+import {TagTypes} from './tagTypes';
+// const REACT_APP_API_URL = 'http://192.168.0.103:5000/';
+const REACT_APP_API_URL = 'http://192.168.43.99:5000/';
+const tagTypeList: string[] = Object.values(TagTypes);
+
 const baseQuery = fetchBaseQuery({
   baseUrl: REACT_APP_API_URL,
   prepareHeaders: async (headers, {getState, endpoint}) => {
@@ -18,7 +22,7 @@ export const apiSlice = createApi({
   // baseQuery:async(args,api,extraOptions)=>{
 
   // },
-  tagTypes: [],
+  tagTypes: tagTypeList,
   endpoints: builder => ({}),
   baseQuery: async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);

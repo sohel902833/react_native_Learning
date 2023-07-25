@@ -1,41 +1,48 @@
 import {useLayoutEffect, useRef, useState} from 'react';
 import {Pressable, StyleSheet, TextInput, ToastAndroid} from 'react-native';
 import {Text, View} from 'react-native';
-import LabeledIconButton from '../../components/Buttons/LabeledIconButton';
-import InputArea from '../../components/TextInputs/InputArea';
 import COLORS from '../../utils/colors';
-import AntIcon from 'react-native-vector-icons/AntDesign';
 import {RootStackParamList} from '../../App';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import globalStyle from '../../utils/globalStyle';
-import ProgressIndecator from '../../components/SendMoney/ProgressIndecator';
 import TapOnHoldToProgress from '../../components/SendMoney/TapAndHoldProgress';
+import {useConfirmSendMoneyMutation} from '../../feature/transections/transectionsApi';
 
 interface Props
   extends NativeStackScreenProps<RootStackParamList, 'Confirm_Send_Money'> {}
 
 const ConfirmSendMoney = ({navigation, route}: Props) => {
-  const pressValue = useRef(0);
-  const [intervalValue, setIntervalValue] = useState(0);
-  let countInterval: any = null;
+  const [confirmSendMoney, {isLoading}] = useConfirmSendMoneyMutation();
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Send Money',
     });
   });
 
-  const handleNavigate = () => {};
+  const navigateToHomePage = () => {
+    navigation.replace('Main_Screen');
+  };
 
-  const {phoneNumber, amount} = route.params;
+  const handleSubmit = async () => {
+    const {token, expiry} = route.params;
+    const res: any = await confirmSendMoney({token});
+    if (res?.data?.success) {
+      ToastAndroid.show(res?.data?.message, ToastAndroid.SHORT);
+      navigateToHomePage();
+    } else {
+      ToastAndroid.show(res?.data?.message, ToastAndroid.LONG);
+    }
+  };
+
+  const {phoneNumber, amount, expiry, availableBalance, charge} = route.params;
+
   return (
     <View style={styles.container}>
       <TapOnHoldToProgress />
       <View style={styles.cardContainer}>
         <Text style={styles.receiverText}>Receiver</Text>
         <View style={styles.receiverNumberContainer}>
-          <Text style={styles.receiverNumberText}>
-            {route?.params?.phoneNumber}
-          </Text>
+          <Text style={styles.receiverNumberText}>{phoneNumber}</Text>
         </View>
       </View>
       {/* enter amount section  */}
@@ -52,12 +59,20 @@ const ConfirmSendMoney = ({navigation, route}: Props) => {
           />
         </View>
         <Text style={[styles.receiverText, {color: COLORS.PRIMARY}]}>
-          Available Balance: $34343
+          Available Balance: {availableBalance}
+        </Text>
+        <Text style={[styles.receiverText, {color: COLORS.PRIMARY}]}>
+          Charge: {charge}
         </Text>
       </View>
       <View style={{marginTop: 15}}></View>
-      <Pressable style={styles.tabBarContainer}>
-        <Text style={styles.cofirmButtonText}>Confirm</Text>
+      <Pressable
+        disabled={isLoading}
+        onPress={handleSubmit}
+        style={styles.tabBarContainer}>
+        <Text style={styles.cofirmButtonText}>
+          {isLoading ? 'Please Wait...' : 'Confirm'}
+        </Text>
       </Pressable>
     </View>
   );

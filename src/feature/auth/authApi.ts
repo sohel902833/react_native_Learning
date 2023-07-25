@@ -1,4 +1,5 @@
 import {apiSlice} from '../api/apiSlice';
+import {TagTypes} from '../api/tagTypes';
 import {setUserInfo} from './authSlice';
 export const authApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -35,6 +36,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: '/user/',
         method: 'GET',
       }),
+      providesTags: [TagTypes.CURRENT_USER],
       async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
           const result: any = await queryFulfilled;
